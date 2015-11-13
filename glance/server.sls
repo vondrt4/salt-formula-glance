@@ -208,7 +208,7 @@ glance_download_{{ image_name }}:
 
 glance_install_image_{{ image_name }}:
   cmd.run:
-  - name: source /root/keystonerc; glance image-create --name '{{ image_name }}' --is-public {{ image.public }} --container-format bare --disk-format {{ image.format }} < /srv/glance/{{ image.file }}
+  - name: . /root/keystonerc; glance image-create --name '{{ image_name }}' --is-public {{ image.public }} --container-format bare --disk-format {{ image.format }} < /srv/glance/{{ image.file }}
   - require:
     - service: glance_services
     - cmd: glance_download_{{ image_name }}
