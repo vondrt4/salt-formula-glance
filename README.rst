@@ -73,6 +73,23 @@ Sample pillar
         audit:
           enabled: false
 
+Client role
+-----------
+
+Glance images
+
+.. code-block:: yaml
+
+  glance:
+    client:
+      enabled: true
+      server:
+        profile_admin:
+          image:
+            cirros-test:
+              visibility: public
+              protected: false
+              location: http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-i386-disk.img
 
 Client-side RabbitMQ HA setup
 

@@ -17,3 +17,12 @@
         }
     },
 }, merge=pillar.glance.get('server', {})) %}
+
+{% set client = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ['python-glanceclient']
+    },
+    'RedHat': {
+        'pkgs': ['python-glanceclient']
+    },
+}, merge=pillar.glance.get('client', {})) %}
