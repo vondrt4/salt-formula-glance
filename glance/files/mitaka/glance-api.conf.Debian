@@ -54,11 +54,11 @@
 
 # Default value for the number of items returned by a request if not
 # specified explicitly in the request (integer value)
-#limit_param_default = 25
+limit_param_default = {{ server.limit_default|default('25') }}
 
 # Maximum permissible number of items that could be returned by a
 # request (integer value)
-#api_limit_max = 1000
+api_limit_max = {{ server.api_limit_max|default('1000') }}
 
 # Whether to include the backend image storage location in image
 # properties. Revealing storage location can be a security risk, so
