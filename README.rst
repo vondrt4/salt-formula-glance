@@ -1,34 +1,14 @@
-==================
-Glance Image Store
-==================
+==============
+Glance formula
+==============
 
 The Glance project provides services for discovering, registering, and
 retrieving virtual machine images. Glance has a RESTful API that allows
 querying of VM image metadata as well as retrieval of the actual image.
 
-Usage
-=====
 
-Import new public image
-
-.. code-block:: yaml
-
-    glance image-create --name 'Windows 7 x86_64' --is-public true --container-format bare --disk-format qcow2  < ./win7.qcow2
-
-Change new image's disk properties
-
-.. code-block:: yaml
-
-    glance image-update "Windows 7 x86_64" --property hw_disk_bus=ide
-
-Change new image's NIC properties
-
-.. code-block:: yaml
-
-    glance image-update "Windows 7 x86_64" --property hw_vif_model=rtl8139
-
-Sample pillar
-=============
+Sample pillars
+==============
 
 .. code-block:: yaml
 
@@ -73,6 +53,68 @@ Sample pillar
         audit:
           enabled: false
 
+Keystone and cinder region
+
+.. code-block:: yaml
+
+    glance:
+      server:
+        enabled: true
+        version: kilo
+        ...
+        identity:
+          engine: keystone
+          host: 127.0.0.1
+          region: RegionTwo
+        ...
+
+Ceph integration glance
+
+.. code-block:: yaml
+
+    glance:
+      server:
+        enabled: true
+        version: juno
+        storage:
+          engine: rbd,http
+          user: glance
+          pool: images
+          chunk_size: 8
+          client_glance_key: AQDOavlU6BsSJhAAnpFR906mvdgdfRqLHwu0Uw==
+
+RabbitMQ HA setup
+
+.. code-block:: yaml
+
+    glance:
+      server:
+        ....
+        message_queue:
+          engine: rabbitmq
+          members:
+            - host: 10.0.16.1
+            - host: 10.0.16.2
+            - host: 10.0.16.3
+          user: openstack
+          password: pwd
+          virtual_host: '/openstack'
+        ....
+
+Enable auditing filter (CADF):
+
+.. code-block:: yaml
+
+    glance:
+      server:
+        audit:
+          enabled: true
+      ....
+          filter_factory: 'keystonemiddleware.audit:filter_factory'
+          map_file: '/etc/pycadf/glance_api_audit_map.conf'
+      ....
+
+
 Client role
 -----------
 
@@ -91,76 +133,37 @@ Glance images
               protected: false
               location: http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-i386-disk.img
 
-Client-side RabbitMQ HA setup
+
+Usage
+=====
+
+Import new public image
 
 .. code-block:: yaml
 
-    glance:
-      server:
-        ....
-        message_queue:
-          engine: rabbitmq
-          members:
-            - host: 10.0.16.1
-            - host: 10.0.16.2
-            - host: 10.0.16.3
-          user: openstack
-          password: pwd
-          virtual_host: '/openstack'
-        ....
+    glance image-create --name 'Windows 7 x86_64' --is-public true --container-format bare --disk-format qcow2  < ./win7.qcow2
 
-
-Enable auditing filter, ie: CADF
+Change new image's disk properties
 
 .. code-block:: yaml
 
-    glance:
-      server:
-        audit:
-          enabled: true
-      ....
-          filter_factory: 'keystonemiddleware.audit:filter_factory'
-          map_file: '/etc/pycadf/glance_api_audit_map.conf'
-      ....
+    glance image-update "Windows 7 x86_64" --property hw_disk_bus=ide
 
-
-Keystone and cinder region
-============================
+Change new image's NIC properties
 
 .. code-block:: yaml
 
-    glance:
-      server:
-        enabled: true
-        version: kilo
-        ...
-        identity:
-          engine: keystone
-          host: 127.0.0.1
-          region: RegionTwo
-        ...
+    glance image-update "Windows 7 x86_64" --property hw_vif_model=rtl8139
 
 
-Ceph integration glance
-=======================
-
-.. code-block:: yaml
-
-    glance:
-      server:
-        enabled: true
-        version: juno
-        storage:
-          engine: rbd,http
-          user: glance
-          pool: images
-          chunk_size: 8
-          client_glance_key: AQDOavlU6BsSJhAAnpFR906mvdgdfRqLHwu0Uw==
+External links
+==============
 
 * http://ceph.com/docs/master/rbd/rbd-openstack/
 
+
 Documentation and Bugs
-============================
+======================
 
 To learn how to deploy OpenStack Salt, consult the documentation available
 online at:
