@@ -39,6 +39,9 @@ backlog = 4096
 # package, it is also possible to use: glance.db.registry.api
 # data_api = glance.db.sqlalchemy.api
 
+limit_param_default = {{ server.limit_default|default('25') }}
+api_limit_max = {{ server.api_limit_max|default('1000') }}
+
 # The number of child process workers that will be
 # created to service API requests. The default will be
 # equal to the number of CPUs available. (integer value)

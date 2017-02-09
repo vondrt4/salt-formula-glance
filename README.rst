@@ -52,6 +52,17 @@ Sample pillars
           public: true
         audit:
           enabled: false
+        api_limit_max: 100
+        limit_param_default: 50
+
+The pagination is controlled by the *api_limit_max* and *limit_param_default*
+parameters as shown above:
+
+* *api_limit_max* defines the maximum number of records that the server will
+  return.
+
+* *limit_param_default* is the default *limit* parameter that
+  applies if the request didn't defined it explicitly.
 
 Keystone and cinder region
 
