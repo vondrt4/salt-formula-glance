@@ -15,4 +15,5 @@ remote_plugin:
     username: {{ server.identity.user }}
     password: {{ server.identity.password }}
     tenant: {{ server.identity.tenant }}
+    region: {{ server.identity.region }}
 {%- endif %}
