@@ -24,6 +24,7 @@ glance:
       password: password
       region: RegionOne
       tenant: service
+      endpoint_type: internalURL
     message_queue:
       engine: rabbitmq
       host: 127.0.0.1

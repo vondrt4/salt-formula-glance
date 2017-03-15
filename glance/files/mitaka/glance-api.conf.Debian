@@ -819,7 +819,7 @@ stores = {{ server.storage.engine }}
 # A string giving the endpoint type of the swift service to use
 # (publicURL, adminURL or internalURL). This setting is only used if
 # swift_store_auth_version is 2. (string value)
-#swift_store_endpoint_type = publicURL
+swift_store_endpoint_type = {{ server.identity.get('endpoint_type', 'publicURL') }}
 
 # A string giving the service type of the swift service to use. This
 # setting is only used if swift_store_auth_version is 2. (string
@@ -947,7 +947,7 @@ rbd_store_ceph_conf = /etc/ceph/ceph.conf
 # Info to match when looking for cinder in the service catalog. Format
 # is : separated values of the form:
 # <service_type>:<service_name>:<endpoint_type> (string value)
-#cinder_catalog_info = volumev2::publicURL
+cinder_catalog_info = volumev2::{{ server.identity.get('endpoint_type', 'publicURL') }}
 
 # Override service catalog lookup with template for cinder endpoint
 # e.g. http://localhost:8776/v2/%(tenant)s (string value)

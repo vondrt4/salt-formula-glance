@@ -1,4 +1,6 @@
 parameters:
+  _param:
+    keystone_glance_endpoint_type: internalURL
   kubernetes:
     control:
       configmap:
@@ -32,6 +34,7 @@ parameters:
                   password: ${_param:keystone_glance_password}
                   region: RegionOne
                   tenant: service
+                  endpoint_type: ${_param:keystone_glance_endpoint_type}
                 message_queue:
                   engine: rabbitmq
                   host: ${_param:rabbitmq_service_host}
