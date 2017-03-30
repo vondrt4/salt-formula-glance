@@ -112,6 +112,19 @@ RabbitMQ HA setup
           virtual_host: '/openstack'
         ....
 
+Enable Glance Image Cache:
+
+.. code-block:: yaml
+
+    glance:
+      server:
+        image_cache:
+          enabled: true
+          enable_management: true
+          directory: /var/lib/glance/image-cache/
+          max_size: 21474836480
+      ....
+
 Enable auditing filter (CADF):
 
 .. code-block:: yaml
