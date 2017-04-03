@@ -1,7 +1,7 @@
 glance:
   server:
     enabled: true
-    version: liberty
+    version: newton
     workers: 1
     database:
       engine: mysql

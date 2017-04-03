@@ -62,6 +62,36 @@ glance_group:
   - require:
     - pkg: glance_packages
 
+{%- if server.version == 'newton' %}
+
+/etc/glance/glance-glare-paste.ini:
+  file.managed:
+  - source: salt://glance/files/{{ server.version }}/glance-glare-paste.ini
+  - template: jinja
+  - require:
+    - pkg: glance_packages
+
+/etc/glance/glance-glare.conf:
+  file.managed:
+  - source: salt://glance/files/{{ server.version }}/glance-glare.conf.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: glance_packages
+
+{%- if not grains.get('noservices', False) %}
+
+glance_glare_service:
+  service.running:
+  - enable: true
+  - name: glance-glare
+  - require_in:
+    - cmd: glance_install_database
+  - watch:
+    - file: /etc/glance/glance-glare.conf
+
+{%- endif %}
+{%- endif %}
+
 {%- if not grains.get('noservices', False) %}
 
 glance_services:
