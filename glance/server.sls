@@ -64,12 +64,17 @@ glance_group:
 
 {%- if server.version == 'newton' %}
 
+glance_glare_package:
+  pkg.installed:
+  - name: glance-glare
+
 /etc/glance/glance-glare-paste.ini:
   file.managed:
   - source: salt://glance/files/{{ server.version }}/glance-glare-paste.ini
   - template: jinja
   - require:
     - pkg: glance_packages
+    - pkg: glance_glare_package
 
 /etc/glance/glance-glare.conf:
   file.managed:
@@ -77,6 +82,7 @@ glance_group:
   - template: jinja
   - require:
     - pkg: glance_packages
+    - pkg: glance_glare_package
 
 {%- if not grains.get('noservices', False) %}
 

@@ -414,6 +414,7 @@ show_image_direct_url = true
 #
 #  (boolean value)
 #enable_v1_api = true
+enable_v1_api=False
 
 #
 # Deploy the v2 OpenStack Images API.
@@ -444,6 +445,7 @@ show_image_direct_url = true
 #
 #  (boolean value)
 #enable_v2_api = true
+enable_v2_api=True
 
 #
 # Deploy the v1 API Registry service.
@@ -1672,12 +1674,12 @@ log_file = /var/log/glance/api.log
 #transport_url = <None>
 {%- if server.message_queue.members is defined %}
 transport_url = rabbit://{% for member in server.message_queue.members -%}
-                             {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ member.get('port', 5672) }}
+                             {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ member.host }}:{{ member.get('port', 5672) }}
                              {%- if not loop.last -%},{%- endif -%}
-                             /{{ server.message_queue.virtual_host }}
                          {%- endfor -%}
+                             /{{ server.message_queue.virtual_host }}
 {%- else %}
-transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ member.get('port', 5672) }}/{{ server.message_queue.virtual_host }}
+transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ server.message_queue.port }}/{{ server.message_queue.virtual_host }}
 {%- endif %}
 
 # DEPRECATED: The messaging driver to use, defaults to rabbit. Other drivers
