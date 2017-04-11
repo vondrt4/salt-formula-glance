@@ -62,7 +62,7 @@ glance_group:
   - require:
     - pkg: glance_packages
 
-{%- if server.version == 'newton' %}
+{%- if server.version == 'newton' or server.version == 'ocata' %}
 
 glance_glare_package:
   pkg.installed:
