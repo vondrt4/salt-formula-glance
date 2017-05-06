@@ -1006,7 +1006,7 @@ log_file = /var/log/glance/registry.log
 #transport_url = <None>
 {%- if server.message_queue.members is defined %}
 transport_url = rabbit://{% for member in server.message_queue.members -%}
-                             {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ member.get('port', 5672) }}
+                             {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ member.host }}:{{ member.get('port', 5672) }}
                              {%- if not loop.last -%},{%- endif -%}
                          {%- endfor -%}
                              {{ server.message_queue.virtual_host }}
