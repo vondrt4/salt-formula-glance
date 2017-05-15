@@ -37,10 +37,6 @@ glance:
       swift:
         store:
           # admin_tenants: 
-          auth:
-            address: http://127.0.0.1:5000/v2.0
-            insecure: false
-            version: 2
           cacert: /etc/ssl/certs/ca-certificates.crt
           # config_file: 
           container: glance
@@ -48,7 +44,6 @@ glance:
           endpoint: swift
           endpoint_type: internalURL
           expire_soon_interval: 60
-          key: someRandomPassword
           large_object_size: 5120
           large_object_chunk_size: 200
           multi_tenant: false
@@ -58,4 +53,17 @@ glance:
           service_type: object-store
           ssl_compression: false
           use_trusts: false
-          user: 2ec7966596504f59acc3a76b3b9d9291:glance-user
+          default_swift_reference: my_swift_server
+          references:
+            my_swift_server:
+              auth:
+                address: http://127.0.0.1:5000/v2.0
+                version: 2
+              user: 2ec7966596504f59acc3a76b3b9d9291:glance-user
+              key: someRandomPassword
+            my_second_swift_server:
+              auth:
+                address: http://127.0.0.2:5000/v2.0
+                version: 2
+              user: 2ec7966596504f59acc3a76b3b9d9291:glance-user
+              key: someRandomPassword
