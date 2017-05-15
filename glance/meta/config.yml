@@ -19,7 +19,4 @@ config:
   glance-registry-paste.ini:
     source: "salt://glance/files/{{ server.version }}/glance-registry-paste.ini"
     template: jinja
-  policy.json:
-    source: "salt://glance/files/{{ server.version }}/policy.json"
-    template: jinja
   {%- endif %}

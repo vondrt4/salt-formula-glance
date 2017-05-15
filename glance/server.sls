@@ -210,19 +210,28 @@ glance_install_image_{{ image_name }}:
 
 {%- endfor %}
 
-{%- if server.policy is defined %}
+{%- for name, rule in server.get('policy', {}).iteritems() %}
 
-{%- for key, policy in server.policy.iteritems() %}
+{%- if rule != None %}
+rule_{{ name }}_present:
+  keystone_policy.rule_present:
+  - path: /etc/glance/policy.json
+  - name: {{ name }}
+  - rule: {{ rule }}
+  - require:
+    - pkg: glance_packages
 
-policy_{{ key }}:
-  file.replace:
-  - name: /etc/glance/policy.json
-  - pattern: "[\"']{{ key }}[\"']:.*"
-  {# unfortunatately there's no jsonify filter so we have to do magic :-( #}
-  - repl: '"{{ key }}": {% if policy is iterable %}[{%- for rule in policy %}"{{ rule }}"{% if not loop.last %}, {% endif %}{%- endfor %}]{%- else %}"{{ policy }}"{%- endif %},'
+{%- else %}
 
-{%- endfor %}
+rule_{{ name }}_absent:
+  keystone_policy.rule_absent:
+  - path: /etc/glance/policy.json
+  - name: {{ name }}
+  - require:
+    - pkg: glance_packages
 
 {%- endif %}
+
+{%- endfor %}
 
 {%- endif %}

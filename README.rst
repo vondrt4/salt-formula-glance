@@ -64,6 +64,17 @@ parameters as shown above:
 * *limit_param_default* is the default *limit* parameter that
   applies if the request didn't defined it explicitly.
 
+Configuration of policy.json file
+
+.. code-block:: yaml
+
+    glance:
+      server:
+        ....
+        policy:
+          publicize_image: "role:admin"
+          # Add key without value to remove line from policy.json
+          add_member:
 Keystone and cinder region
 
 .. code-block:: yaml

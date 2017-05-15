@@ -67,3 +67,6 @@ glance:
                 version: 2
               user: 2ec7966596504f59acc3a76b3b9d9291:glance-user
               key: someRandomPassword
+    policy:
+      publicize_image: "role:admin"
+      add_member:
