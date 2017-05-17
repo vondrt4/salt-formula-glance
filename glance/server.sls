@@ -92,6 +92,7 @@ glance_glare_service:
   - name: glance-glare
   - require_in:
     - cmd: glance_install_database
+    - cmd: glance_load_metadatafs
   - watch:
     - file: /etc/glance/glance-glare.conf
 
@@ -125,6 +126,12 @@ glance_install_database:
   - name: glance-manage db_sync
   - require:
     - service: glance_services
+
+glance_load_metadatafs:
+  cmd.run:
+  - name: glance-manage db_load_metadefs
+  - require:
+    - cmd: glance_install_database
 
 {%- if server.get('image_cache', {}).get('enabled', False) %}
 glance_cron_glance-cache-pruner:
