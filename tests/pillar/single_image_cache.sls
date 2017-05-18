@@ -39,3 +39,6 @@ glance:
       enable_management: true
       directory: /var/lib/glance/image-cache/
       max_size: 21474836480
+    policy:
+      publicize_image: "role:admin"
+      add_member:

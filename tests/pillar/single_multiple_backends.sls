@@ -68,3 +68,6 @@ glance:
           ssl_compression: false
           use_trusts: false
           user: 2ec7966596504f59acc3a76b3b9d9291:glance-project
+    policy:
+      publicize_image: "role:admin"
+      add_member:

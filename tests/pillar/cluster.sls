@@ -40,3 +40,6 @@ glance:
     audit:
       filter_factory: 'keystonemiddleware.audit:filter_factory'
       map_file: '/etc/pycadf/glance_api_audit_map.conf'
+    policy:
+      publicize_image: "role:admin"
+      add_member:

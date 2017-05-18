@@ -34,3 +34,6 @@ glance:
       virtual_host: '/openstack'
     storage:
       engine: file
+    policy:
+      publicize_image: "role:admin"
+      add_member:
