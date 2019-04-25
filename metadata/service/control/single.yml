@@ -1,10 +1,15 @@
 applications:
 - glance
+classes:
+- service.glance.support
 parameters:
+  _param:
+    keystone_glance_endpoint_type: internalURL
   glance:
     server:
       enabled: true
       version: ${_param:glance_version}
+      workers: 1
       database:
         engine: mysql
         host: localhost
@@ -24,7 +29,9 @@ parameters:
         port: 35357
         user: glance
         password: ${_param:keystone_glance_password}
+        region: RegionOne
         tenant: service
+        endpoint_type: ${_param:keystone_glance_endpoint_type}
       message_queue:
         engine: rabbitmq
         host: ${_param:single_address}

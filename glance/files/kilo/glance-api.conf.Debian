@@ -41,7 +41,7 @@ backlog = 4096
 # The number of child process workers that will be
 # created to service API requests. The default will be
 # equal to the number of CPUs available. (integer value)
-workers = 8
+workers = {{ server.workers }}
 
 # Maximum line size of message headers to be accepted.
 # max_header_line may need to be increased when using large tokens
@@ -214,6 +214,9 @@ registry_client_protocol = http
 #auth_url = None
 # Keystone region
 #auth_region = None
+{% if server.identity.region is defined %}
+auth_region = {{ server.identity.region }}
+{% endif %}
 # Auth strategy
 #auth_strategy = keystone
 
@@ -243,8 +246,17 @@ notifier_strategy=rabbit
 notification_driver = messagingv2
 # Configuration options if sending notifications via rabbitmq (these are
 # the defaults)
+
+{%- if server.message_queue.members is defined %}
+rabbit_hosts = {% for member in server.message_queue.members -%}
+                   {{ member.host }}:{{ member.get('port', 5672) }}
+                   {%- if not loop.last -%},{%- endif -%}
+               {%- endfor -%}
+{%- else %}
 rabbit_host = {{ server.message_queue.host }}
 rabbit_port = {{ server.message_queue.port }}
+{%- endif %}
+
 rabbit_use_ssl = false
 rabbit_userid = {{ server.message_queue.user }}
 rabbit_password = {{ server.message_queue.password }}
@@ -350,7 +362,7 @@ backend = sqlalchemy
 # Deprecated group/name - [DATABASE]/sql_connection
 # Deprecated group/name - [sql]/connection
 #connection = <None>
-connection = {{ pillar.glance.server.database.engine }}://{{ pillar.glance.server.database.user }}:{{ pillar.glance.server.database.password }}@{{ pillar.glance.server.database.host }}/{{ pillar.glance.server.database.name }}
+connection = {{ server.database.engine }}://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}
 
 # The SQL mode to be used for MySQL sessions. This option,
 # including the default, overrides any server-set SQL mode. To
@@ -448,14 +460,35 @@ max_overflow = 30
 # Deprecated group/name - [DEFAULT]/lock_path (string value)
 #lock_path = /tmp
 
+{%- if server.identity.get('version', 2) == 2 %}
+
 [keystone_authtoken]
-identity_uri = http://{{ pillar.glance.server.identity.host }}:35357
-admin_tenant_name = {{ pillar.glance.server.identity.tenant }}
-admin_user = {{ pillar.glance.server.identity.user }}
-admin_password = {{ pillar.glance.server.identity.password }}
+identity_uri = http://{{ server.identity.host }}:35357
+admin_tenant_name = {{ server.identity.tenant }}
+admin_user = {{ server.identity.user }}
+admin_password = {{ server.identity.password }}
 revocation_cache_time = 10
-auth_uri=http://{{ pillar.glance.server.identity.host }}:5000
-auth_url=http://{{ pillar.glance.server.identity.host }}:35357
+auth_uri=http://{{ server.identity.host }}:5000
+auth_url=http://{{ server.identity.host }}:35357
+
+{%- else %}
+
+[keystone_authtoken]
+identity_uri = http://{{ server.identity.host }}:35357/v3
+revocation_cache_time = 10
+auth_section = generic_password
+
+[generic_password]
+auth_plugin = password
+user_domain_id = {{ server.identity.get('domain', 'default') }}
+project_domain_id = {{ server.identity.get('domain', 'default') }}
+project_name = {{ server.identity.tenant }}
+username = {{ server.identity.user }}
+password = {{ server.identity.password }}
+auth_uri=http://{{ server.identity.host }}:5000/v3
+auth_url=http://{{ server.identity.host }}:35357/v3
+
+{%- endif %}
 
 [paste_deploy]
 # Name of the paste configuration file that defines the available pipelines
@@ -544,12 +577,13 @@ flavor=keystone
 # by the stores option.
 # Deprecated group/name - [DEFAULT]/default_store
 # Default: 'file'
-default_store = file
 
 {%- if server.storage.engine == 'file' %}
+default_store = file
 stores = glance.store.filesystem.Store,
          glance.store.http.Store
 {%- else %}
+default_store = {{ server.storage.engine }}
 stores = {{ server.storage.engine }}
 {%- endif %}
 # ============ Filesystem Store Options ========================
@@ -582,35 +616,35 @@ filesystem_store_datadir = /var/lib/glance/images/
 
 # Version of the authentication service to use
 # Valid versions are '2' for keystone and '1' for swauth and rackspace
-swift_store_auth_version = 2
+# swift_store_auth_version = 2
 
 # Address where the Swift authentication service lives
 # Valid schemes are 'http://' and 'https://'
 # If no scheme specified,  default to 'https://'
 # For swauth, use something like '127.0.0.1:8080/v1.0/'
-swift_store_auth_address = 127.0.0.1:5000/v2.0/
+# swift_store_auth_address = 127.0.0.1:5000/v2.0/
 
 # User to authenticate against the Swift authentication service
 # If you use Swift authentication service, set it to 'account':'user'
 # where 'account' is a Swift storage account and 'user'
 # is a user in that account
-swift_store_user = jdoe:jdoe
+# swift_store_user = jdoe:jdoe
 
 # Auth key for the user authenticating against the
 # Swift authentication service
-swift_store_key = a86850deb2742ec3cb41518e26aa2d89
+# swift_store_key = a86850deb2742ec3cb41518e26aa2d89
 
 # Container within the account that the account should use
 # for storing images in Swift
-swift_store_container = glance
+# swift_store_container = glance
 
 # Do we create the container if it does not exist?
-swift_store_create_container_on_put = False
+# swift_store_create_container_on_put = False
 
 # What size, in MB, should Glance start chunking image files
 # and do a large object manifest in Swift? By default, this is
 # the maximum object size in Swift, which is 5GB
-swift_store_large_object_size = 5120
+# swift_store_large_object_size = 5120
 
 # swift_store_config_file = glance-swift.conf
 # This file contains references for each of the configured
@@ -625,7 +659,7 @@ swift_store_large_object_size = 5120
 # Glance write chunks to Swift? This amount of data is written
 # to a temporary disk buffer during the process of chunking
 # the image file, and the default is 200MB
-swift_store_large_object_chunk_size = 200
+# swift_store_large_object_chunk_size = 200
 
 # If set, the configured endpoint will be used. If None, the storage URL
 # from the auth response will be used. The location of an object is
@@ -686,14 +720,14 @@ swift_store_large_object_chunk_size = 200
 # Address where the S3 authentication service lives
 # Valid schemes are 'http://' and 'https://'
 # If no scheme specified,  default to 'http://'
-s3_store_host = s3.amazonaws.com
+#s3_store_host = s3.amazonaws.com
 
 # User to authenticate against the S3 authentication service
-s3_store_access_key = <20-char AWS access key>
+#s3_store_access_key = <20-char AWS access key>
 
 # Auth key for the user authenticating against the
 # S3 authentication service
-s3_store_secret_key = <40-char AWS secret key>
+#s3_store_secret_key = <40-char AWS secret key>
 
 # Container within the account that the account should use
 # for storing images in S3. Note that S3 has a flat namespace,
@@ -701,10 +735,10 @@ s3_store_secret_key = <40-char AWS secret key>
 # easy way to do this is append your AWS access key to "glance".
 # S3 buckets in AWS *must* be lowercased, so remember to lowercase
 # your AWS access key if you use it in your bucket name below!
-s3_store_bucket = <lowercased 20-char aws access key>glance
+#s3_store_bucket = <lowercased 20-char aws access key>glance
 
 # Do we create the bucket if it does not exist?
-s3_store_create_bucket_on_put = False
+#s3_store_create_bucket_on_put = False
 
 # When sending images to S3, the data will first be written to a
 # temporary buffer on disk. By default the platform's temporary directory
@@ -773,7 +807,7 @@ sheepdog_store_chunk_size = 64
 # Info to match when looking for cinder in the service catalog
 # Format is : separated values of the form:
 # <service_type>:<service_name>:<endpoint_type> (string value)
-#cinder_catalog_info = volume:cinder:publicURL
+cinder_catalog_info = volume:cinder:{{ server.identity.get('endpoint_type', 'publicURL') }}
 
 # Override service catalog lookup with template for cinder endpoint
 # e.g. http://localhost:8776/v1/%(project_id)s (string value)
@@ -781,7 +815,9 @@ sheepdog_store_chunk_size = 64
 
 # Region name of this node (string value)
 #os_region_name = <None>
-
+{% if server.identity.region is defined %}
+os_region_name = {{ server.identity.region }}
+{% endif %}
 # Location of ca certicates file to use for cinder client requests
 # (string value)
 #cinder_ca_certificates_file = <None>

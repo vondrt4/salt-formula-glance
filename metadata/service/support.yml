@@ -1,0 +1,17 @@
+parameters:
+  glance:
+    _support:
+      collectd:
+        enabled: true
+      heka:
+        enabled: true
+      sensu:
+        enabled: false
+      sphinx:
+        enabled: true
+      config:
+        enabled: true
+      grafana:
+        enabled: true
+      prometheus:
+        enabled: true

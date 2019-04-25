@@ -1,0 +1,6 @@
+name: "glance"
+version: "2016.4.1"
+source: "https://github.com/openstack/salt-formula-glance"
+dependencies:
+  - name: keystone
+    source: "https://github.com/salt-formulas/salt-formula-keystone"
